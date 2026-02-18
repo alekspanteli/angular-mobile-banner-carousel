@@ -1,6 +1,55 @@
 :host {
   display: block;
   width: 100%;
-  max-width: 600px;
   overflow: hidden;
+}
+
+.desktop-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 2.5rem;
+  text-align: center;
+  background: #1a1a2e;
+
+  .icon {
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.25rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .title {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .subtitle {
+    margin: 0 0 1.5rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.45);
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  .resize-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }

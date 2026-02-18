@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__angular-cli__list_projects"
+      "mcp__angular-cli__list_projects",
+      "Bash(npx ng build:*)"
     ]
   }
 }

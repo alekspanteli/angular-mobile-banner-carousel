@@ -1,7 +1,29 @@
-@if (loading()) {
-  <div class="loading-screen">
-    <div class="spinner"></div>
-  </div>
+@if (isMobile()) {
+  @if (loading()) {
+    <div class="loading-screen">
+      <div class="spinner"></div>
+    </div>
+  } @else {
+    <app-mobile-carousel [banners]="banners()" />
+  }
 } @else {
-  <app-mobile-carousel [banners]="banners()" />
+  <div class="desktop-placeholder">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+    </div>
+    <p class="title">Mobile Experience</p>
+    <p class="subtitle">Resize your browser to a smaller width to preview the carousel.</p>
+    <div class="resize-hint">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"/>
+        <polyline points="9 21 3 21 3 15"/>
+        <line x1="21" y1="3" x2="14" y2="10"/>
+        <line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+      <span>Drag the edge of your browser window</span>
+    </div>
+  </div>
 }

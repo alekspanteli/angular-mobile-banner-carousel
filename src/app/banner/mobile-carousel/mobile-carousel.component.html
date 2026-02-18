@@ -1,0 +1,73 @@
+<div class="carousel-viewport">
+  <div
+    class="carousel-track"
+    [style.transform]="'translateX(' + translateX() + 'px)'"
+    [class.transitioning]="isTransitioning()"
+    (transitionend)="onTransitionEnd()"
+  >
+    <!-- Clone of last slide -->
+    <div
+      class="carousel-slide"
+      [style.background-image]="'url(' + banners()[banners().length - 1].backgroundImage + ')'"
+    >
+      <img
+        class="slide-image"
+        [src]="banners()[banners().length - 1].mainImage"
+        [alt]="banners()[banners().length - 1].title"
+      />
+      <div class="slide-content">
+        <h2>{{ banners()[banners().length - 1].title }}</h2>
+        <p>{{ banners()[banners().length - 1].text }}</p>
+        <button class="slide-btn">{{ banners()[banners().length - 1].buttonText }}</button>
+      </div>
+    </div>
+
+    <!-- Real slides -->
+    @for (banner of banners(); track banner.id) {
+      <div
+        class="carousel-slide"
+        [style.background-image]="'url(' + banner.backgroundImage + ')'"
+      >
+        <img
+          class="slide-image"
+          [src]="banner.mainImage"
+          [alt]="banner.title"
+        />
+        <div class="slide-content">
+          <h2>{{ banner.title }}</h2>
+          <p>{{ banner.text }}</p>
+          <button class="slide-btn">{{ banner.buttonText }}</button>
+        </div>
+      </div>
+    }
+
+    <!-- Clone of first slide -->
+    <div
+      class="carousel-slide"
+      [style.background-image]="'url(' + banners()[0].backgroundImage + ')'"
+    >
+      <img
+        class="slide-image"
+        [src]="banners()[0].mainImage"
+        [alt]="banners()[0].title"
+      />
+      <div class="slide-content">
+        <h2>{{ banners()[0].title }}</h2>
+        <p>{{ banners()[0].text }}</p>
+        <button class="slide-btn">{{ banners()[0].buttonText }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dot indicators -->
+  <div class="carousel-dots">
+    @for (banner of banners(); track banner.id; let i = $index) {
+      <button
+        class="dot"
+        [class.active]="i === activeDot()"
+        (click)="goToDot(i)"
+        [attr.aria-label]="'Go to slide ' + (i + 1)"
+      ></button>
+    }
+  </div>
+</div>
