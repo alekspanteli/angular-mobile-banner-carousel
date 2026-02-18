@@ -1,12 +1,22 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Banner } from './banner.model';
+import { BannerService } from './banner.service';
+import { MobileCarouselComponent } from './mobile-carousel.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [MobileCarouselComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('current-directory');
+  banners = signal<Banner[]>([]);
+  loading = signal(true);
+
+  constructor(private bannerService: BannerService) {
+    this.bannerService.getBanners().subscribe(banners => {
+      this.banners.set(banners);
+      this.loading.set(false);
+    });
+  }
 }
