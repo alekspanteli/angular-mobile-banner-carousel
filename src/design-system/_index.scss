@@ -1,0 +1,7 @@
+// ============================================================================
+// Design System - Barrel File
+// Import this file in components: @use 'design-system' as *;
+// ============================================================================
+
+@forward 'tokens';
+@forward 'properties';

@@ -5,6 +5,7 @@ import { map } from 'rxjs';
 import { Banner } from './banner/banner.model';
 import { BannerService } from './banner/banner.service';
 import { MobileCarouselComponent } from './banner/mobile-carousel/mobile-carousel.component';
+import { BREAKPOINT_MOBILE } from '../design-system/breakpoints';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,7 @@ export class App {
   loading = signal(true);
   isMobile = toSignal(
     inject(BreakpointObserver)
-      .observe('(max-width: 600px)')
+      .observe(BREAKPOINT_MOBILE)
       .pipe(map(result => result.matches)),
     { initialValue: false },
   );

@@ -8,7 +8,7 @@ const BANNERS: Banner[] = [
     backgroundImage: 'images/winzup-bg-mob.webp',
     mainImage: 'images/winzup_mob.png',
     title: 'WinzUp Loyalty Program',
-    text: 'Get up to 35% in rewards: daily rakeback, weekly cashback and level-up bonuses',
+    text: 'Get up to **35% in rewards:** daily rakeback, weekly cashback and level-up bonuses',
     buttonText: 'Join now',
   },
   {
@@ -16,7 +16,7 @@ const BANNERS: Banner[] = [
     backgroundImage: 'images/ValentinesFortuneDrops_mob-bg.png',
     mainImage: 'images/ValentinesFortuneDrops_mob-pic.png',
     title: `Valentine's Fortune Drops`,
-    text: 'Trigger random prizes and win a share of €30,000!',
+    text: 'Trigger random prizes and win a share of **€30,000!**',
     buttonText: 'Learn more',
   },
   {
@@ -24,7 +24,7 @@ const BANNERS: Banner[] = [
     backgroundImage: 'images/wheel-mob-bg.webp',
     mainImage: 'images/wheel-mob.png',
     title: 'Wheel of Winz',
-    text: 'Spin the wheel to win up to €15,000 weekly',
+    text: 'Spin the wheel to win up to **€15,000** weekly',
     buttonText: 'Spin now',
   },
 ];

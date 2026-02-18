@@ -10,10 +10,11 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { Banner } from '../banner.model';
+import { HighlightTextPipe } from '../highlight-text.pipe';
 
 @Component({
   selector: 'app-mobile-carousel',
-  standalone: true,
+  imports: [HighlightTextPipe],
   templateUrl: './mobile-carousel.component.html',
   styleUrl: './mobile-carousel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,0 +1,15 @@
+// ============================================================================
+// CSS Custom Properties
+// Runtime-accessible design tokens on :root
+// Generated automatically from token maps via @each loops
+// ============================================================================
+
+@use 'tokens' as *;
+
+:root {
+  @each $map in $all-token-maps {
+    @each $name, $value in $map {
+      --#{$name}: #{$value};
+    }
+  }
+}

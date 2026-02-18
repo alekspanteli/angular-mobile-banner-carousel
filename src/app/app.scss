@@ -6,46 +6,47 @@
 
 .desktop-placeholder {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 2.5rem;
-  text-align: center;
-  background: #1a1a2e;
 
-  .icon {
-    color: rgba(255, 255, 255, 0.3);
-    margin-bottom: 1.25rem;
+  padding: var(--spacing-section-padding);
+  text-align: center;
+  background: var(--color-bg);
+
+  &__icon {
+    color: var(--color-text-30);
+    margin-bottom: var(--spacing-icon-gap);
     animation: float 3s ease-in-out infinite;
   }
 
-  .title {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
+  &__title {
+    margin: 0 0 var(--spacing-title-gap);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-85);
   }
 
-  .subtitle {
-    margin: 0 0 1.5rem;
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.45);
-    max-width: 280px;
-    line-height: 1.5;
+  &__subtitle {
+    margin: 0 0 var(--spacing-subtitle-gap);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-45);
+    max-width: var(--subtitle-max-width);
+    line-height: var(--line-height-normal);
   }
 
-  .resize-hint {
+  &__resize-hint {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.35);
+    gap: var(--spacing-title-gap);
+    padding: var(--spacing-title-gap) 1rem;
+    background: var(--color-overlay);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-35);
   }
 }
 

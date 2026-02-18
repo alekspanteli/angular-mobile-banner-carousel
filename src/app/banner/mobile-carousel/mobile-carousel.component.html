@@ -1,70 +1,70 @@
-<div class="carousel-viewport">
+<div class="carousel__viewport">
   <div
-    class="carousel-track"
+    class="carousel__track"
     [style.transform]="'translateX(' + translateX() + 'px)'"
-    [class.transitioning]="isTransitioning()"
+    [class.carousel__track--transitioning]="isTransitioning()"
     (transitionend)="onTransitionEnd()"
   >
     <!-- Clone of last slide -->
     <div
-      class="carousel-slide"
+      class="carousel__slide"
       [style.background-image]="'url(' + banners()[banners().length - 1].backgroundImage + ')'"
     >
       <img
-        class="slide-image"
+        class="carousel__image"
         [src]="banners()[banners().length - 1].mainImage"
         [alt]="banners()[banners().length - 1].title"
       />
-      <div class="slide-content">
-        <h2>{{ banners()[banners().length - 1].title }}</h2>
-        <p>{{ banners()[banners().length - 1].text }}</p>
-        <button class="slide-btn">{{ banners()[banners().length - 1].buttonText }}</button>
+      <div class="carousel__content">
+        <h2 class="carousel__title">{{ banners()[banners().length - 1].title }}</h2>
+        <p class="carousel__text">@for (seg of banners()[banners().length - 1].text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
+        <button class="carousel__btn">{{ banners()[banners().length - 1].buttonText }}</button>
       </div>
     </div>
 
     <!-- Real slides -->
     @for (banner of banners(); track banner.id) {
       <div
-        class="carousel-slide"
+        class="carousel__slide"
         [style.background-image]="'url(' + banner.backgroundImage + ')'"
       >
         <img
-          class="slide-image"
+          class="carousel__image"
           [src]="banner.mainImage"
           [alt]="banner.title"
         />
-        <div class="slide-content">
-          <h2>{{ banner.title }}</h2>
-          <p>{{ banner.text }}</p>
-          <button class="slide-btn">{{ banner.buttonText }}</button>
+        <div class="carousel__content">
+          <h2 class="carousel__title">{{ banner.title }}</h2>
+          <p class="carousel__text">@for (seg of banner.text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
+          <button class="carousel__btn">{{ banner.buttonText }}</button>
         </div>
       </div>
     }
 
     <!-- Clone of first slide -->
     <div
-      class="carousel-slide"
+      class="carousel__slide"
       [style.background-image]="'url(' + banners()[0].backgroundImage + ')'"
     >
       <img
-        class="slide-image"
+        class="carousel__image"
         [src]="banners()[0].mainImage"
         [alt]="banners()[0].title"
       />
-      <div class="slide-content">
-        <h2>{{ banners()[0].title }}</h2>
-        <p>{{ banners()[0].text }}</p>
-        <button class="slide-btn">{{ banners()[0].buttonText }}</button>
+      <div class="carousel__content">
+        <h2 class="carousel__title">{{ banners()[0].title }}</h2>
+        <p class="carousel__text">@for (seg of banners()[0].text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
+        <button class="carousel__btn">{{ banners()[0].buttonText }}</button>
       </div>
     </div>
   </div>
 
   <!-- Dot indicators -->
-  <div class="carousel-dots">
+  <div class="carousel__dots">
     @for (banner of banners(); track banner.id; let i = $index) {
       <button
-        class="dot"
-        [class.active]="i === activeDot()"
+        class="carousel__dot"
+        [class.carousel__dot--active]="i === activeDot()"
         (click)="goToDot(i)"
         [attr.aria-label]="'Go to slide ' + (i + 1)"
       ></button>
