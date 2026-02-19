@@ -7,7 +7,3 @@ export interface Banner {
   buttonText: string;
 }
 
-export interface TextSegment {
-  text: string;
-  highlight: boolean;
-}

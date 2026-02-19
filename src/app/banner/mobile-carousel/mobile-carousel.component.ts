@@ -9,12 +9,28 @@ import {
   inject,
   ChangeDetectionStrategy,
 } from '@angular/core';
+
+import {
+  CAROUSEL_AUTO_PLAY_INTERVAL,
+  CAROUSEL_SWIPE_THRESHOLD_RATIO,
+  CAROUSEL_DIRECTION_LOCK_THRESHOLD,
+  CAROUSEL_SLIDE_IMAGE_WIDTH,
+  CAROUSEL_SLIDE_IMAGE_MAX_WIDTH,
+  CAROUSEL_SLIDE_MIN_HEIGHT,
+  CAROUSEL_SLIDE_CONTENT_MAX_WIDTH,
+  CAROUSEL_DOT_SIZE,
+  CAROUSEL_DOT_ACTIVE_SCALE,
+  CAROUSEL_TRANSITION_SLIDE,
+} from './carousel.config';
+
+
 import { Banner } from '../banner.model';
-import { HighlightTextPipe } from '../highlight-text.pipe';
+import { HighlightTextPipe } from '../../shared/pipes/highlight-text.pipe';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-mobile-carousel',
-  imports: [HighlightTextPipe],
+  imports: [HighlightTextPipe, NgOptimizedImage],
   templateUrl: './mobile-carousel.component.html',
   styleUrl: './mobile-carousel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,6 +41,7 @@ import { HighlightTextPipe } from '../highlight-text.pipe';
   },
 })
 export class MobileCarouselComponent implements OnInit, OnDestroy {
+  private rafId: number | null = null;
   banners = input.required<Banner[]>();
 
   /** Index into the extended track: 0 = last clone, 1..N = real slides, N+1 = first clone */
@@ -42,6 +59,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     if (idx > count) return 0;
     return idx - 1;
   });
+
 
   private touchStartX = 0;
   private touchStartY = 0;
@@ -66,6 +84,10 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopAutoPlay();
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
   }
 
   onTouchStart(event: TouchEvent): void {
@@ -83,7 +105,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     const dy = event.touches[0].clientY - this.touchStartY;
 
     if (!this.directionLocked) {
-      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      if (Math.abs(dx) > CAROUSEL_DIRECTION_LOCK_THRESHOLD || Math.abs(dy) > CAROUSEL_DIRECTION_LOCK_THRESHOLD) {
         this.directionLocked = true;
         this.isSwiping = Math.abs(dx) > Math.abs(dy);
       }
@@ -99,7 +121,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
 
   onTouchEnd(): void {
     if (this.isSwiping) {
-      const threshold = window.innerWidth * 0.2;
+      const threshold = window.innerWidth * CAROUSEL_SWIPE_THRESHOLD_RATIO;
       if (this.touchDeltaX < -threshold) {
         this.goToIndex(this.trackIndex() + 1);
       } else if (this.touchDeltaX > threshold) {
@@ -141,14 +163,20 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   }
 
   private updateTranslate(): void {
-    this.translateX.set(-this.trackIndex() * window.innerWidth);
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+    }
+    this.rafId = requestAnimationFrame(() => {
+      this.translateX.set(-this.trackIndex() * window.innerWidth);
+      this.rafId = null;
+    });
   }
 
   private startAutoPlay(): void {
     this.stopAutoPlay();
     this.autoTimer = setInterval(() => {
       this.goToIndex(this.trackIndex() + 1);
-    }, 10_000);
+    }, CAROUSEL_AUTO_PLAY_INTERVAL);
   }
 
   private stopAutoPlay(): void {

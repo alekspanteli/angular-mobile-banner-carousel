@@ -1,72 +1,50 @@
-<div class="carousel__viewport">
+<div class="carousel__viewport" role="region" aria-label="Banner carousel">
   <div
     class="carousel__track"
     [style.transform]="'translateX(' + translateX() + 'px)'"
     [class.carousel__track--transitioning]="isTransitioning()"
     (transitionend)="onTransitionEnd()"
+    role="listbox"
+    aria-live="polite"
   >
-    <!-- Clone of last slide -->
-    <div
-      class="carousel__slide"
-      [style.background-image]="'url(' + banners()[banners().length - 1].backgroundImage + ')'"
-    >
-      <img
-        class="carousel__image"
-        [src]="banners()[banners().length - 1].mainImage"
-        [alt]="banners()[banners().length - 1].title"
-      />
-      <div class="carousel__content">
-        <h2 class="carousel__title">{{ banners()[banners().length - 1].title }}</h2>
-        <p class="carousel__text">@for (seg of banners()[banners().length - 1].text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
-        <button class="carousel__btn">{{ banners()[banners().length - 1].buttonText }}</button>
-      </div>
-    </div>
-
-    <!-- Real slides -->
-    @for (banner of banners(); track banner.id) {
+    <!-- Render all slides (last clone, real slides, first clone) with a single template -->
+    @for (slide of [banners()[banners().length - 1], ...banners(), banners()[0]]; track i; let i = $index) {
       <div
         class="carousel__slide"
-        [style.background-image]="'url(' + banner.backgroundImage + ')'"
+        [style.background-image]="'url(' + slide.backgroundImage + ')'"
+        role="option"
+        [attr.aria-selected]="i === activeDot()"
+        tabindex="-1"
       >
-        <img
-          class="carousel__image"
-          [src]="banner.mainImage"
-          [alt]="banner.title"
-        />
+          @if (slide.mainImage) {
+            <img
+              class="carousel__image"
+              [ngSrc]="slide.mainImage"
+              [alt]="slide.title"
+              width="240"
+              height="240"
+            />
+          }
         <div class="carousel__content">
-          <h2 class="carousel__title">{{ banner.title }}</h2>
-          <p class="carousel__text">@for (seg of banner.text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
-          <button class="carousel__btn">{{ banner.buttonText }}</button>
+          <h2 class="carousel__title">{{ slide.title }}</h2>
+          <p class="carousel__text">@for (seg of slide.text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
+          <button class="carousel__btn" type="button">{{ slide.buttonText }}</button>
         </div>
       </div>
     }
-
-    <!-- Clone of first slide -->
-    <div
-      class="carousel__slide"
-      [style.background-image]="'url(' + banners()[0].backgroundImage + ')'"
-    >
-      <img
-        class="carousel__image"
-        [src]="banners()[0].mainImage"
-        [alt]="banners()[0].title"
-      />
-      <div class="carousel__content">
-        <h2 class="carousel__title">{{ banners()[0].title }}</h2>
-        <p class="carousel__text">@for (seg of banners()[0].text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
-        <button class="carousel__btn">{{ banners()[0].buttonText }}</button>
-      </div>
-    </div>
   </div>
 
   <!-- Dot indicators -->
-  <div class="carousel__dots">
+  <div class="carousel__dots" role="tablist" aria-label="Carousel navigation">
     @for (banner of banners(); track banner.id; let i = $index) {
       <button
         class="carousel__dot"
         [class.carousel__dot--active]="i === activeDot()"
         (click)="goToDot(i)"
         [attr.aria-label]="'Go to slide ' + (i + 1)"
+        role="tab"
+        [attr.aria-selected]="i === activeDot()"
+        [attr.tabindex]="i === activeDot() ? 0 : -1"
       ></button>
     }
   </div>

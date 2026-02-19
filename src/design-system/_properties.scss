@@ -6,7 +6,9 @@
 
 @use 'tokens' as *;
 
+
 :root {
+  // Export all tokens as CSS custom properties, including OKLCH colors
   @each $map in $all-token-maps {
     @each $name, $value in $map {
       --#{$name}: #{$value};

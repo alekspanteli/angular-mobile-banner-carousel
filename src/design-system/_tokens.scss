@@ -3,26 +3,28 @@
 // Single source of truth for all visual properties
 // ============================================================================
 
-// --- Colors ---
-$color-bg: #1a1a2e;
-$color-accent: #ffe066;
-$color-text: #fff;
 
-// Text opacity variants
-$color-text-85: rgba(255, 255, 255, 0.85);
-$color-text-45: rgba(255, 255, 255, 0.45);
-$color-text-35: rgba(255, 255, 255, 0.35);
-$color-text-30: rgba(255, 255, 255, 0.3);
+// --- Colors (OKLCH) ---
+// OKLCH: oklch(<lightness> <chroma> <hue>)
+$color-bg: oklch(29.5% 0.05 264); // deep indigo background
+$color-accent: oklch(94% 0.19 105); // vibrant yellow accent
+$color-text: oklch(99% 0.01 270); // near white text
+
+// Text opacity variants (using OKLCH base)
+$color-text-85: color-mix(in oklch, oklch(99% 0.01 270) 85%, transparent);
+$color-text-45: color-mix(in oklch, oklch(99% 0.01 270) 45%, transparent);
+$color-text-35: color-mix(in oklch, oklch(99% 0.01 270) 35%, transparent);
+$color-text-30: color-mix(in oklch, oklch(99% 0.01 270) 30%, transparent);
 
 // Surface / overlay
-$color-overlay: rgba(255, 255, 255, 0.08);
-$color-border: rgba(255, 255, 255, 0.1);
-$color-border-strong: rgb(255 255 255 / 0.85);
+$color-overlay: color-mix(in oklch, oklch(99% 0.01 270) 8%, transparent);
+$color-border: color-mix(in oklch, oklch(99% 0.01 270) 10%, transparent);
+$color-border-strong: color-mix(in oklch, oklch(99% 0.01 270) 85%, transparent);
 
 // Shadows
-$color-shadow: rgb(0 0 0 / 0.5);
-$color-shadow-light: rgb(0 0 0 / 0.4);
-$color-spinner-track: rgba(255, 255, 255, 0.2);
+$color-shadow: color-mix(in oklch, black 50%, transparent);
+$color-shadow-light: color-mix(in oklch, black 40%, transparent);
+$color-spinner-track: color-mix(in oklch, oklch(99% 0.01 270) 20%, transparent);
 
 // --- Typography ---
 $font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

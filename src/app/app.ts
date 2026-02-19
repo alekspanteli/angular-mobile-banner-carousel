@@ -1,7 +1,5 @@
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { useBreakpoint } from './shared/use-breakpoint';
 import { Banner } from './banner/banner.model';
 import { BannerService } from './banner/banner.service';
 import { MobileCarouselComponent } from './banner/mobile-carousel/mobile-carousel.component';
@@ -13,17 +11,15 @@ import { BREAKPOINT_MOBILE } from '../design-system/breakpoints';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
+
 export class App {
   banners = signal<Banner[]>([]);
   loading = signal(true);
-  isMobile = toSignal(
-    inject(BreakpointObserver)
-      .observe(BREAKPOINT_MOBILE)
-      .pipe(map(result => result.matches)),
-    { initialValue: false },
-  );
+  isMobile = useBreakpoint(BREAKPOINT_MOBILE, false);
 
-  constructor(private bannerService: BannerService) {
+  private bannerService = inject(BannerService);
+
+  constructor() {
     this.bannerService.getBanners().subscribe(banners => {
       this.banners.set(banners);
       this.loading.set(false);
