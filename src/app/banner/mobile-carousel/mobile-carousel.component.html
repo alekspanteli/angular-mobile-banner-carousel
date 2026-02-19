@@ -28,7 +28,6 @@
             <h2 class="carousel__title">{{ slide.title }}</h2>
             <p class="carousel__text">@for (seg of slide.text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
             <app-button
-              class="carousel__btn"
               variant="outline"
               [ariaLabel]="slide.buttonText"
             >

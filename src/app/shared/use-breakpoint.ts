@@ -1,4 +1,4 @@
-import { inject, signal } from '@angular/core';
+import { inject } from '@angular/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable } from 'rxjs';

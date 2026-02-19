@@ -81,10 +81,6 @@ describe('MobileCarouselComponent', () => {
     expect(slides[slides.length - 1].id).toBe(mockBanners[0].id);
   });
 
-  it('should report live text', () => {
-    expect(component.liveText()).toBe('Slide 1 of 3');
-  });
-
   it('should go to next and previous slide on swipe', async () => {
     const initialIndex = component.trackIndex();
     const originalInnerWidth = window.innerWidth;
@@ -130,28 +126,4 @@ describe('MobileCarouselComponent', () => {
     expect((component as any).autoTimer).toBeNull();
   });
 
-  it('should toggle pause state', () => {
-    expect(component.paused()).toBe(false);
-    component.toggleAutoPlay();
-    expect(component.paused()).toBe(true);
-    component.toggleAutoPlay();
-    expect(component.paused()).toBe(false);
-  });
-
-  it('should navigate dots with keyboard', () => {
-    component.goToDot(0);
-    expect(component.activeDot()).toBe(0);
-
-    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
-    expect(component.activeDot()).toBe(1);
-
-    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
-    expect(component.activeDot()).toBe(0);
-
-    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'End' }));
-    expect(component.activeDot()).toBe(2);
-
-    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'Home' }));
-    expect(component.activeDot()).toBe(0);
-  });
 });

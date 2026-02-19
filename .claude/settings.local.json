@@ -4,7 +4,10 @@
       "mcp__angular-cli__list_projects",
       "Bash(npx ng build:*)",
       "mcp__angular-cli__get_best_practices",
-      "Bash(npx ng test --watch=false)"
+      "Bash(npx ng test --watch=false)",
+      "Bash(git push:*)",
+      "Bash(python -c:*)",
+      "Bash(node -e:*)"
     ]
   }
 }
