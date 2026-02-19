@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 
-@Pipe({ name: 'highlightText', standalone: true })
+@Pipe({ name: 'highlightText' })
 export class HighlightTextPipe implements PipeTransform {
   transform(value: string): { text: string; highlight: boolean }[] {
     const segments: { text: string; highlight: boolean }[] = [];

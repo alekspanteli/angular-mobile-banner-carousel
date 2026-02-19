@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { useBreakpoint } from './shared/use-breakpoint';
-import { Banner } from './banner/banner.model';
 import { BannerService } from './banner/banner.service';
 import { MobileCarouselComponent } from './banner/mobile-carousel/mobile-carousel.component';
 import { BREAKPOINT_MOBILE } from '../design-system/breakpoints';
@@ -10,19 +10,12 @@ import { BREAKPOINT_MOBILE } from '../design-system/breakpoints';
   imports: [MobileCarouselComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-
 export class App {
-  banners = signal<Banner[]>([]);
-  loading = signal(true);
-  isMobile = useBreakpoint(BREAKPOINT_MOBILE, false);
-
   private bannerService = inject(BannerService);
 
-  constructor() {
-    this.bannerService.getBanners().subscribe(banners => {
-      this.banners.set(banners);
-      this.loading.set(false);
-    });
-  }
+  readonly banners = toSignal(this.bannerService.getBanners(), { initialValue: [] });
+  readonly loading = computed(() => this.banners().length === 0);
+  readonly isMobile = useBreakpoint(BREAKPOINT_MOBILE, false);
 }

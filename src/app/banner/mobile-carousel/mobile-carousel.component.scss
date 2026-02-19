@@ -1,14 +1,6 @@
 :host {
-  --slide-min-height: 520px;
-  --slide-image-width: 240px;
-  --slide-image-max-width: 65%;
-  --slide-content-max-width: 340px;
-  --dot-size: 12px;
-  --dot-active-scale: 1.25;
-  --transition-slide: 400ms;
-
   display: block;
-  width: 100dvw;
+  width: 100%;
   overflow: hidden;
   position: relative;
   touch-action: pan-y;
@@ -29,14 +21,14 @@
     will-change: transform;
 
     &--transitioning {
-      transition: transform var(--transition-slide) var(--ease-slide);
+      transition: transform 400ms var(--ease-slide);
     }
   }
 
   &__slide {
-    flex: 0 0 100dvw;
-    width: 100dvw;
-    min-height: var(--slide-min-height);
+    flex: 0 0 100%;
+    width: 100%;
+    min-height: 520px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -49,8 +41,8 @@
   }
 
   &__image {
-    width: var(--slide-image-width);
-    max-width: var(--slide-image-max-width);
+    width: 240px;
+    max-width: 65%;
     height: auto;
     margin-block-end: var(--spacing-3xl);
     filter: drop-shadow(var(--shadow-drop));
@@ -61,7 +53,7 @@
   &__content {
     text-align: center;
     color: var(--color-text);
-    max-width: var(--slide-content-max-width);
+    max-width: 340px;
   }
 
   &__title {
@@ -85,30 +77,10 @@
     font-weight: var(--font-weight-bold);
   }
 
-  &__dots {
-    position: absolute;
-    inset-block-end: var(--spacing-xl);
-    inset-inline-start: 50%;
-    translate: -50% 0;
-    display: flex;
-    gap: var(--spacing-md);
-    z-index: var(--z-dots);
-  }
+}
 
-  &__dot {
-    width: var(--dot-size);
-    height: var(--dot-size);
-    border-radius: 50%;
-    border: none;
-    background: var(--color-text-35);
-    padding: 0;
-    cursor: pointer;
-    transition-property: background, scale;
-    transition-duration: var(--transition-normal);
-
-    &--active {
-      background: var(--color-accent);
-      scale: var(--dot-active-scale);
-    }
+@media (prefers-reduced-motion: reduce) {
+  .carousel__track--transitioning {
+    transition: none;
   }
 }

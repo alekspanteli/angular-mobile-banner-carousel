@@ -5,8 +5,22 @@ import { HighlightTextPipe } from '../../shared/pipes/highlight-text.pipe';
 import { NgOptimizedImage } from '@angular/common';
 import { Component } from '@angular/core';
 
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+});
 
-// Mock Banner Data
 const mockBanners: Banner[] = [
   {
     id: 1,
@@ -37,7 +51,6 @@ const mockBanners: Banner[] = [
 @Component({
   selector: 'app-host',
   template: `<app-mobile-carousel [banners]="banners"></app-mobile-carousel>`,
-  standalone: true,
   imports: [MobileCarouselComponent],
 })
 class HostComponent {
@@ -61,42 +74,50 @@ describe('MobileCarouselComponent', () => {
     expect(component.slideCount()).toBe(mockBanners.length);
   });
 
+  it('should create slides with clones', () => {
+    const slides = component.slides();
+    expect(slides.length).toBe(mockBanners.length + 2);
+    expect(slides[0].id).toBe(mockBanners[mockBanners.length - 1].id);
+    expect(slides[slides.length - 1].id).toBe(mockBanners[0].id);
+  });
+
+  it('should report live text', () => {
+    expect(component.liveText()).toBe('Slide 1 of 3');
+  });
+
   it('should go to next and previous slide on swipe', async () => {
     const initialIndex = component.trackIndex();
-    // Set window.innerWidth to a known value for threshold logic
     const originalInnerWidth = window.innerWidth;
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1000 });
-    // Helper to mock TouchEvent with preventDefault
+
     const makeTouchEvent = (touches: any[]) => ({
       touches,
       preventDefault: () => {},
     }) as any;
-    // Simulate swipe left (next) with distance > 200
+
     component.onTouchStart(makeTouchEvent([{ clientX: 500, clientY: 0 }]));
     component.onTouchMove(makeTouchEvent([{ clientX: 200, clientY: 0 }]));
     component.onTouchEnd();
     fixture.detectChanges();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(component.trackIndex()).toBe(initialIndex + 1);
-    // Simulate swipe right (previous) with distance > 200
+
     component.onTouchStart(makeTouchEvent([{ clientX: 200, clientY: 0 }]));
     component.onTouchMove(makeTouchEvent([{ clientX: 500, clientY: 0 }]));
     component.onTouchEnd();
     fixture.detectChanges();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(component.trackIndex()).toBe(initialIndex);
-    // Restore window.innerWidth
+
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalInnerWidth });
   });
 
   it('should auto-play to next slide after interval', async () => {
     const initialIndex = component.trackIndex();
-    // Patch startAutoPlay to use a short interval for testing
     (component as any).stopAutoPlay();
     (component as any).autoTimer = setInterval(() => {
       (component as any).goToIndex(component.trackIndex() + 1);
     }, 10);
-    // Wait for the interval to trigger
     await new Promise((resolve) => setTimeout(resolve, 20));
     fixture.detectChanges();
     expect(component.trackIndex()).toBe(initialIndex + 1);
@@ -107,5 +128,30 @@ describe('MobileCarouselComponent', () => {
     (component as any).autoTimer = setInterval(() => {}, 10000);
     component.ngOnDestroy();
     expect((component as any).autoTimer).toBeNull();
+  });
+
+  it('should toggle pause state', () => {
+    expect(component.paused()).toBe(false);
+    component.toggleAutoPlay();
+    expect(component.paused()).toBe(true);
+    component.toggleAutoPlay();
+    expect(component.paused()).toBe(false);
+  });
+
+  it('should navigate dots with keyboard', () => {
+    component.goToDot(0);
+    expect(component.activeDot()).toBe(0);
+
+    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(component.activeDot()).toBe(1);
+
+    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    expect(component.activeDot()).toBe(0);
+
+    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'End' }));
+    expect(component.activeDot()).toBe(2);
+
+    component.onDotsKeydown(new KeyboardEvent('keydown', { key: 'Home' }));
+    expect(component.activeDot()).toBe(0);
   });
 });

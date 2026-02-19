@@ -2,22 +2,37 @@
   <main>
     @if (loading()) {
       <section class="loading-screen" aria-busy="true" aria-label="Loading banners">
-        <div class="loading-screen__spinner" role="status" aria-label="Loading"></div>
+        <div class="loading-screen__spinner"></div>
+        <span class="visually-hidden">Loading banners</span>
       </section>
     } @else {
+      <section class="dummy-content" aria-label="Dummy content for scroll testing">
+        <h2>Content Above Carousel</h2>
+        <p>Scroll down to reach the carousel. This content exists to make the page scrollable so you can test that vertical scrolling is prevented during horizontal swipes.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
+      </section>
+
       <app-mobile-carousel [banners]="banners()" />
+
+      <section class="dummy-content" aria-label="Dummy content for scroll testing">
+        <h2>Content Below Carousel</h2>
+        @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+          <p>Dummy paragraph {{ i }} — This filler content ensures the page is tall enough to scroll vertically. Try swiping horizontally on the carousel above and notice the page does not scroll.</p>
+        }
+      </section>
     }
   </main>
 } @else {
   <section class="desktop-placeholder" aria-label="Desktop preview info">
-    <figure class="desktop-placeholder__icon" aria-hidden="true">
+    <div class="desktop-placeholder__icon" aria-hidden="true">
       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
         <line x1="12" y1="18" x2="12.01" y2="18"/>
       </svg>
-    </figure>
+    </div>
     <h1 class="desktop-placeholder__title">Mobile Experience</h1>
-    <h2 class="desktop-placeholder__subtitle">Resize your browser to a smaller width to preview the carousel.</h2>
+    <p class="desktop-placeholder__subtitle">Resize your browser to a smaller width to preview the carousel.</p>
     <div class="desktop-placeholder__resize-hint" role="note">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 3 21 3 21 9"/>

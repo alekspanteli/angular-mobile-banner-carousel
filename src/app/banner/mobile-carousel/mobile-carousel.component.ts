@@ -8,24 +8,16 @@ import {
   DestroyRef,
   inject,
   ChangeDetectionStrategy,
+  ElementRef,
 } from '@angular/core';
 
 import {
   CAROUSEL_AUTO_PLAY_INTERVAL,
   CAROUSEL_SWIPE_THRESHOLD_RATIO,
   CAROUSEL_DIRECTION_LOCK_THRESHOLD,
-  CAROUSEL_SLIDE_IMAGE_WIDTH,
-  CAROUSEL_SLIDE_IMAGE_MAX_WIDTH,
-  CAROUSEL_SLIDE_MIN_HEIGHT,
-  CAROUSEL_SLIDE_CONTENT_MAX_WIDTH,
-  CAROUSEL_DOT_SIZE,
-  CAROUSEL_DOT_ACTIVE_SCALE,
-  CAROUSEL_TRANSITION_SLIDE,
 } from './carousel.config';
 
-
 import { Banner } from '../banner.model';
-
 import { HighlightTextPipe } from '../../shared/pipes/highlight-text.pipe';
 import { NgOptimizedImage } from '@angular/common';
 import { ButtonComponent } from '../../shared/button/button.component';
@@ -44,24 +36,19 @@ import { ButtonComponent } from '../../shared/button/button.component';
 })
 export class MobileCarouselComponent implements OnInit, OnDestroy {
   private rafId: number | null = null;
+  private el = inject(ElementRef);
+
   banners = input.required<Banner[]>();
 
-  /** Index into the extended track: 0 = last clone, 1..N = real slides, N+1 = first clone */
   trackIndex = signal(1);
   translateX = signal(0);
   isTransitioning = signal(true);
-
   readonly slideCount = computed(() => this.banners().length);
 
-  /** Real slide index (0-based) for dot indicators */
-  readonly activeDot = computed(() => {
-    const idx = this.trackIndex();
-    const count = this.slideCount();
-    if (idx <= 0) return count - 1;
-    if (idx > count) return 0;
-    return idx - 1;
+  readonly slides = computed(() => {
+    const b = this.banners();
+    return b.length ? [b[b.length - 1], ...b, b[0]] : [];
   });
-
 
   private touchStartX = 0;
   private touchStartY = 0;
@@ -69,7 +56,9 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   private isSwiping = false;
   private directionLocked = false;
   private autoTimer: ReturnType<typeof setInterval> | null = null;
+  private prefersReducedMotion = false;
   private destroyRef = inject(DestroyRef);
+
   private resizeHandler = () => {
     this.isTransitioning.set(false);
     this.updateTranslate();
@@ -78,10 +67,16 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.trackIndex.set(1);
     this.updateTranslate();
-    this.startAutoPlay();
 
-    window.addEventListener('resize', this.resizeHandler);
-    this.destroyRef.onDestroy(() => window.removeEventListener('resize', this.resizeHandler));
+    if (typeof window !== 'undefined') {
+      this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.addEventListener('resize', this.resizeHandler);
+      this.destroyRef.onDestroy(() => window.removeEventListener('resize', this.resizeHandler));
+    }
+
+    if (!this.prefersReducedMotion) {
+      this.startAutoPlay();
+    }
   }
 
   ngOnDestroy(): void {
@@ -116,14 +111,16 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     if (this.isSwiping) {
       event.preventDefault();
       this.touchDeltaX = dx;
-      const base = -this.trackIndex() * window.innerWidth;
+      const viewportWidth = this.getViewportWidth();
+      const base = -this.trackIndex() * viewportWidth;
       this.translateX.set(base + dx);
     }
   }
 
   onTouchEnd(): void {
     if (this.isSwiping) {
-      const threshold = window.innerWidth * CAROUSEL_SWIPE_THRESHOLD_RATIO;
+      const viewportWidth = this.getViewportWidth();
+      const threshold = viewportWidth * CAROUSEL_SWIPE_THRESHOLD_RATIO;
       if (this.touchDeltaX < -threshold) {
         this.goToIndex(this.trackIndex() + 1);
       } else if (this.touchDeltaX > threshold) {
@@ -136,11 +133,6 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     this.isSwiping = false;
     this.directionLocked = false;
     this.startAutoPlay();
-  }
-
-  goToDot(realIndex: number): void {
-    this.goToIndex(realIndex + 1);
-    this.restartAutoPlay();
   }
 
   onTransitionEnd(): void {
@@ -164,17 +156,23 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     this.updateTranslate();
   }
 
+  private getViewportWidth(): number {
+    return this.el.nativeElement.offsetWidth || (typeof window !== 'undefined' ? window.innerWidth : 0);
+  }
+
   private updateTranslate(): void {
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
     }
     this.rafId = requestAnimationFrame(() => {
-      this.translateX.set(-this.trackIndex() * window.innerWidth);
+      const viewportWidth = this.getViewportWidth();
+      this.translateX.set(-this.trackIndex() * viewportWidth);
       this.rafId = null;
     });
   }
 
   private startAutoPlay(): void {
+    if (this.prefersReducedMotion) return;
     this.stopAutoPlay();
     this.autoTimer = setInterval(() => {
       this.goToIndex(this.trackIndex() + 1);
@@ -188,8 +186,4 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     }
   }
 
-  private restartAutoPlay(): void {
-    this.stopAutoPlay();
-    this.startAutoPlay();
-  }
 }
