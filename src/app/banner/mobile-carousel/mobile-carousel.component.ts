@@ -25,12 +25,14 @@ import {
 
 
 import { Banner } from '../banner.model';
+
 import { HighlightTextPipe } from '../../shared/pipes/highlight-text.pipe';
 import { NgOptimizedImage } from '@angular/common';
+import { ButtonComponent } from '../../shared/button/button.component';
 
 @Component({
   selector: 'app-mobile-carousel',
-  imports: [HighlightTextPipe, NgOptimizedImage],
+  imports: [HighlightTextPipe, NgOptimizedImage, ButtonComponent],
   templateUrl: './mobile-carousel.component.html',
   styleUrl: './mobile-carousel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

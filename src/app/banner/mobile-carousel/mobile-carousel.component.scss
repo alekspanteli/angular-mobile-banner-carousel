@@ -85,26 +85,6 @@
     font-weight: var(--font-weight-bold);
   }
 
-  &__btn {
-    background: transparent;
-    border: 2px solid var(--color-border-strong);
-    color: var(--color-text);
-    border-radius: var(--radius-pill);
-    padding: var(--spacing-md) var(--spacing-5xl);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast),
-      border-color var(--transition-fast);
-    letter-spacing: var(--letter-spacing-wide);
-
-    &:active {
-      background: var(--color-text);
-      color: var(--color-bg);
-      border-color: var(--color-text);
-    }
-  }
-
   &__dots {
     position: absolute;
     inset-block-end: var(--spacing-xl);
@@ -123,7 +103,8 @@
     background: var(--color-text-35);
     padding: 0;
     cursor: pointer;
-    transition: background var(--transition-normal), scale var(--transition-normal);
+    transition-property: background, scale;
+    transition-duration: var(--transition-normal);
 
     &--active {
       background: var(--color-accent);
