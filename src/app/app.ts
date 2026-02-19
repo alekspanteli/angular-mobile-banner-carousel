@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { inject as injectAnalytics } from '@vercel/analytics';
 import { useBreakpoint } from './shared/use-breakpoint';
 import { BannerService } from './banner/banner.service';
 import { MobileCarouselComponent } from './banner/mobile-carousel/mobile-carousel.component';
 import { BREAKPOINT_MOBILE } from '../design-system/breakpoints';
 
-injectAnalytics();
+// ...existing code...
 
 @Component({
   selector: 'app-root',
