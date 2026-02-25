@@ -51,15 +51,15 @@
       (transitionend)="onTransitionEnd()"
     >
       @for (slide of slides(); track slide.id + '-' + $index; let i = $index) {
+        @let isClone = i === 0 || i === slides().length - 1;
         <div
           class="carousel__slide"
           [style.background-image]="'url(' + slide.backgroundImage + ')'"
           role="group"
           aria-roledescription="slide"
-          [attr.aria-label]="i === 0 || i === slides().length - 1
-            ? null
-            : 'Slide ' + i + ' of ' + slideCount()"
-          [attr.aria-hidden]="i === 0 || i === slides().length - 1 ? 'true' : null"
+          [attr.aria-label]="isClone ? null : 'Slide ' + i + ' of ' + slideCount()"
+          [attr.aria-hidden]="isClone ? 'true' : null"
+          [attr.inert]="isClone ? '' : null"
         >
           @if (slide.mainImage) {
             <img
@@ -68,7 +68,7 @@
               [alt]="slide.title"
               width="378"
               height="257"
-              priority
+              [priority]="i === 1"
             />
           }
           <div class="carousel__content">
@@ -85,5 +85,17 @@
       }
     </div>
 
+    <!-- Dot indicators -->
+    <nav class="carousel__dots" aria-label="Slide navigation">
+      @for (banner of banners(); track banner.id; let idx = $index) {
+        <button
+          class="carousel__dot"
+          [class.carousel__dot--active]="activeSlideIndex() === idx + 1"
+          [attr.aria-label]="'Go to slide ' + (idx + 1) + ' of ' + slideCount()"
+          [attr.aria-current]="activeSlideIndex() === idx + 1 ? 'true' : null"
+          (click)="goToSlide(idx + 1)"
+        ></button>
+      }
+    </nav>
   </div>
 }

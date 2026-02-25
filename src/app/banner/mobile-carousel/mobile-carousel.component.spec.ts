@@ -127,10 +127,34 @@ describe('MobileCarouselComponent', () => {
   describe('banner without mainImage', () => {
     it('should handle banners with optional mainImage', () => {
       const slides = component.slides();
-      // Banner 3 has no mainImage
       const banner3Slide = slides.find(s => s.id === 3);
       expect(banner3Slide).toBeDefined();
       expect(banner3Slide!.mainImage).toBeUndefined();
+    });
+  });
+
+  describe('input reactivity', () => {
+    it('should reset to slide 1 when banners input changes', () => {
+      // Advance to slide 2
+      component.onTouchStart(makeTouchEvent(300, 0));
+      component.onTouchMove(makeTouchEvent(50, 0));
+      component.onTouchEnd();
+
+      // Change banners — effect should reset trackIndex
+      host.banners.set([
+        { id: 10, backgroundImage: 'new1.jpg', title: 'New 1', text: 'T', buttonText: 'B' },
+        { id: 11, backgroundImage: 'new2.jpg', title: 'New 2', text: 'T', buttonText: 'B' },
+      ]);
+      fixture.detectChanges();
+
+      expect(component.trackIndex()).toBe(1);
+      expect(component.slideCount()).toBe(2);
+    });
+
+    it('should stop autoplay when switching to single banner', () => {
+      host.banners.set([mockBanners[0]]);
+      fixture.detectChanges();
+      expect((component as any).autoTimer).toBeNull();
     });
   });
 
@@ -151,7 +175,6 @@ describe('MobileCarouselComponent', () => {
     });
 
     it('should go to previous slide on right swipe', () => {
-      // First advance to slide 2
       component.onTouchStart(makeTouchEvent(300, 0));
       component.onTouchMove(makeTouchEvent(50, 0));
       component.onTouchEnd();
@@ -166,7 +189,6 @@ describe('MobileCarouselComponent', () => {
     it('should snap back if swipe does not exceed threshold', () => {
       const initial = component.trackIndex();
       component.onTouchStart(makeTouchEvent(200, 0));
-      // Small movement — 30px on 400px viewport = 7.5%, below 20% threshold
       component.onTouchMove(makeTouchEvent(170, 0));
       component.onTouchEnd();
       expect(component.trackIndex()).toBe(initial);
@@ -183,13 +205,49 @@ describe('MobileCarouselComponent', () => {
     it('should not swipe on vertical gesture (scroll)', () => {
       const initial = component.trackIndex();
       component.onTouchStart(makeTouchEvent(200, 0));
-      // Move mostly vertical
       const verticalEvent = {
         touches: [{ clientX: 202, clientY: 100 }],
         preventDefault: () => {},
       } as unknown as TouchEvent;
       component.onTouchMove(verticalEvent);
       component.onTouchEnd();
+      expect(component.trackIndex()).toBe(initial);
+    });
+  });
+
+  describe('keyboard navigation', () => {
+    it('should advance on ArrowRight', () => {
+      const initial = component.trackIndex();
+      component.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+      expect(component.trackIndex()).toBe(initial + 1);
+    });
+
+    it('should go back on ArrowLeft', () => {
+      // First advance
+      component.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+      const after = component.trackIndex();
+      component.onKeyDown(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+      expect(component.trackIndex()).toBe(after - 1);
+    });
+
+    it('should ignore non-arrow keys', () => {
+      const initial = component.trackIndex();
+      component.onKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+      expect(component.trackIndex()).toBe(initial);
+    });
+  });
+
+  describe('dot indicator navigation', () => {
+    it('should navigate to a specific slide via goToSlide', () => {
+      component.goToSlide(3);
+      expect(component.trackIndex()).toBe(3);
+    });
+
+    it('should ignore out-of-range indices', () => {
+      const initial = component.trackIndex();
+      component.goToSlide(0);
+      expect(component.trackIndex()).toBe(initial);
+      component.goToSlide(99);
       expect(component.trackIndex()).toBe(initial);
     });
   });
@@ -218,12 +276,10 @@ describe('MobileCarouselComponent', () => {
     });
 
     it('should advance slide after autoplay interval', () => {
-      // Restart autoplay under fake timers so setInterval is captured
       (component as any).stopAutoPlay();
       (component as any).startAutoPlay();
       const initial = component.trackIndex();
       vi.advanceTimersByTime(CAROUSEL_AUTO_PLAY_INTERVAL + 100);
-      // goToIndex sets trackIndex synchronously before scheduling rAF
       expect(component.trackIndex()).toBeGreaterThan(initial);
     });
 
@@ -247,7 +303,7 @@ describe('MobileCarouselComponent', () => {
     });
 
     it('should cancel pending rAF on destroy', () => {
-      (component as any).updateTranslate();
+      (component as any).updateTranslateSync();
       expect((component as any).rafId).not.toBeNull();
       component.ngOnDestroy();
       expect((component as any).rafId).toBeNull();

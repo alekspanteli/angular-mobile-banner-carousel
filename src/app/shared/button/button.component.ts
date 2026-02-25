@@ -13,7 +13,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline';
   template: `
     <button
       [type]="type()"
-      [attr.aria-label]="ariaLabel()"
+      [attr.aria-label]="ariaLabel() ?? null"
       [disabled]="disabled()"
       [class]="buttonClass()"
       (click)="buttonClick.emit($event)"

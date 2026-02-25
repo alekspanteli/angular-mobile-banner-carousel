@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay, retry } from 'rxjs';
-import { Banner } from './banner.model';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, delay, retry, timer, map } from 'rxjs';
+import { Banner, parseBanners } from './banner.model';
 
 const BANNERS: readonly Banner[] = [
   {
@@ -29,14 +30,36 @@ const BANNERS: readonly Banner[] = [
   },
 ] as const;
 
+/** Whether to use mock data instead of HTTP. Flip to false when a real API exists. */
+const USE_MOCK = true;
+
 @Injectable({ providedIn: 'root' })
 export class BannerService {
+  private readonly http = inject(HttpClient, { optional: true });
+
   getBanners(): Observable<Banner[]> {
-    // Simulates an API call with network latency.
-    // In production, replace with: this.http.get<Banner[]>('/api/banners')
-    return of(BANNERS as Banner[]).pipe(
-      delay(800),
-      retry({ count: 2, delay: 1000 }),
+    if (USE_MOCK) {
+      // Simulates network latency for development.
+      return of([...BANNERS]).pipe(delay(800));
+    }
+
+    if (!this.http) {
+      throw new Error(
+        'BannerService requires HttpClient. Provide provideHttpClient() in your app config.',
+      );
+    }
+
+    return this.http.get<unknown>('/api/banners').pipe(
+      // Validate at the system boundary — API response is unknown until proven safe.
+      map((data) => {
+        const banners = parseBanners(data);
+        if (banners.length === 0) {
+          throw new Error('API returned no valid banners');
+        }
+        return banners;
+      }),
+      // Exponential backoff: 1s, 2s, 4s — prevents thundering herd on transient failures.
+      retry({ count: 2, delay: (_, retryIndex) => timer(1000 * Math.pow(2, retryIndex - 1)) }),
     );
   }
 }

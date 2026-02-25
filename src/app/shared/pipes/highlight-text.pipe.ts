@@ -7,8 +7,8 @@ export interface TextSegment {
 
 @Pipe({ name: 'highlightText', pure: true })
 export class HighlightTextPipe implements PipeTransform {
-  transform(value: string | null | undefined): TextSegment[] {
-    if (!value) return [];
+  transform(value: unknown): TextSegment[] {
+    if (typeof value !== 'string' || !value) return [];
 
     const segments: TextSegment[] = [];
     const regex = /\*\*(.*?)\*\*/g;

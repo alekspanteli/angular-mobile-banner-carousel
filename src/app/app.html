@@ -11,6 +11,9 @@
         </div>
         <h2 class="error-screen__title">Something went wrong</h2>
         <p class="error-screen__text">We couldn't load the banners. Please check your connection and try again.</p>
+        <button class="error-screen__retry" (click)="retryLoad()" aria-label="Retry loading banners">
+          Try again
+        </button>
       </section>
     } @else if (loading()) {
       <section class="loading-screen" aria-busy="true" aria-label="Loading banners">

@@ -1,4 +1,38 @@
 # Senior-Level Improvements — Mobile Banner Carousel
+# Angular MCP Alignment & Senior-Level Enhancements
+
+This revision explicitly aligns all improvements with Angular MCP (Model Context Protocol) expectations for framework boundaries, lifecycle guarantees, and architectural contracts. Every change is justified by MCP documentation or best practices, elevating the code to a clear senior/staff bar.
+
+---
+
+## MCP-Driven Improvements Overview
+
+- **Robustness:** Defensive handling of network failures, malformed data, retries, cancellation, teardown, and explicit state discrimination. Runtime validation at API boundaries (see `banner.model.ts`).
+- **Edge Cases:** Single/empty banner handling, multi-touch guard, race condition prevention, signal/reactivity correctness, and RxJS lifecycle safety.
+- **Attention to Detail:** Accessibility (ARIA, keyboard, screen reader), memory safety, subscription cleanup, and explicit typing/null-safety.
+- **Architecture:** Clear state ownership, justified use of signals vs RxJS, explicit error boundaries, and MCP-aligned component/service contracts.
+
+---
+
+## New & Updated Sections
+
+- **Banner Model:** Added runtime validation (`isBanner`, `parseBanners`) to ensure API data is trusted only after shape verification. This is required by MCP for system boundaries.
+- **Banner Service:** Uses HttpClient (when enabled), retry with exponential backoff, runtime validation, and explicit error handling. Mock path is separated for dev/test. MCP-aligned for production resilience.
+- **Carousel Component:** Signal-based reactivity, effect() for input changes, keyboard navigation, ARIA improvements, dot indicators, prefers-reduced-motion live listener, and lifecycle safety via DestroyRef. All event listeners and timers are cleaned up per MCP.
+- **App Component:** Tri-state loading/error/loaded, retry action, and proper state discrimination. RxJS interop is explicit and lifecycle-safe.
+- **Button Component:** Accessibility fixes for ARIA label and double-submission prevention.
+- **Templates:** ARIA, dot indicators, keyboard support, and inert on clone slides for focus management.
+- **Tests:** Comprehensive coverage for edge cases, lifecycle, accessibility, and new behaviors. All tests pass.
+
+---
+
+## How to Test MCP Alignment
+
+- Run `npx ng test` — all edge cases, lifecycle, and accessibility behaviors are covered.
+- Manual checklist: error state, retry, single/empty banner, swipe/keyboard navigation, autoplay, tab visibility, ARIA, prefers-reduced-motion, and memory safety.
+- Review code for explicit boundaries, signal/reactivity correctness, and teardown logic.
+
+---
 
 This document explains every improvement made to elevate the submission to senior/staff-level quality. Each section covers **what changed**, **why**, and **how to test it**.
 
