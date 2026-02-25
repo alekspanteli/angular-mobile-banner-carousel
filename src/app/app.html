@@ -1,6 +1,18 @@
 @if (isMobile()) {
   <main>
-    @if (loading()) {
+    @if (error()) {
+      <section class="error-screen" role="alert">
+        <div class="error-screen__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <h2 class="error-screen__title">Something went wrong</h2>
+        <p class="error-screen__text">We couldn't load the banners. Please check your connection and try again.</p>
+      </section>
+    } @else if (loading()) {
       <section class="loading-screen" aria-busy="true" aria-label="Loading banners">
         <div class="loading-screen__spinner"></div>
         <span class="visually-hidden">Loading banners</span>
@@ -13,7 +25,9 @@
         <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
       </section>
 
-      <app-mobile-carousel [banners]="banners()" />
+      @if (banners().length) {
+        <app-mobile-carousel [banners]="banners()" />
+      }
 
       <section class="dummy-content" aria-label="Dummy content for scroll testing">
         <h2>Content Below Carousel</h2>

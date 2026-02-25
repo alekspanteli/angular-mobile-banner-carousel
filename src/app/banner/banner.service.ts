@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Observable, of, delay, retry } from 'rxjs';
 import { Banner } from './banner.model';
 
 const BANNERS: readonly Banner[] = [
@@ -27,12 +27,16 @@ const BANNERS: readonly Banner[] = [
     text: 'Spin the wheel to win up to **€15,000** weekly',
     buttonText: 'Spin now',
   },
- ] as const;
+] as const;
 
 @Injectable({ providedIn: 'root' })
 export class BannerService {
   getBanners(): Observable<Banner[]> {
-    // Simulates an API call with network latency
-    return of(BANNERS as Banner[]).pipe(delay(800));
+    // Simulates an API call with network latency.
+    // In production, replace with: this.http.get<Banner[]>('/api/banners')
+    return of(BANNERS as Banner[]).pipe(
+      delay(800),
+      retry({ count: 2, delay: 1000 }),
+    );
   }
 }

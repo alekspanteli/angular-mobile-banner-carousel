@@ -36,7 +36,9 @@ import { ButtonComponent } from '../../shared/button/button.component';
 })
 export class MobileCarouselComponent implements OnInit, OnDestroy {
   private rafId: number | null = null;
+  private destroyed = false;
   private el = inject(ElementRef);
+  private destroyRef = inject(DestroyRef);
 
   banners = input.required<Banner[]>();
 
@@ -45,9 +47,24 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   isTransitioning = signal(true);
   readonly slideCount = computed(() => this.banners().length);
 
+  /** Whether the carousel uses infinite-loop mode (requires 2+ banners). */
+  readonly isInfinite = computed(() => this.banners().length > 1);
+
+  /** The current logical slide index (1-based, within real banners). */
+  readonly activeSlideIndex = computed(() => {
+    const count = this.slideCount();
+    if (count === 0) return 0;
+    const idx = this.trackIndex();
+    if (idx <= 0) return count;
+    if (idx > count) return 1;
+    return idx;
+  });
+
   readonly slides = computed(() => {
     const b = this.banners();
-    return b.length ? [b[b.length - 1], ...b, b[0]] : [];
+    if (b.length === 0) return [];
+    if (b.length === 1) return b;
+    return [b[b.length - 1], ...b, b[0]];
   });
 
   private touchStartX = 0;
@@ -57,7 +74,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   private directionLocked = false;
   private autoTimer: ReturnType<typeof setInterval> | null = null;
   private prefersReducedMotion = false;
-  private destroyRef = inject(DestroyRef);
+  private visibilityHandler: (() => void) | null = null;
 
   private resizeHandler = () => {
     this.isTransitioning.set(false);
@@ -65,6 +82,13 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    if (!this.isInfinite()) {
+      // Single banner or empty — render statically, no autoplay/infinite loop
+      this.trackIndex.set(this.banners().length > 0 ? 0 : 0);
+      this.updateTranslate();
+      return;
+    }
+
     this.trackIndex.set(1);
     this.updateTranslate();
 
@@ -74,12 +98,29 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
       this.destroyRef.onDestroy(() => window.removeEventListener('resize', this.resizeHandler));
     }
 
+    if (typeof document !== 'undefined') {
+      this.visibilityHandler = () => {
+        if (document.hidden) {
+          this.stopAutoPlay();
+        } else if (!this.prefersReducedMotion) {
+          this.startAutoPlay();
+        }
+      };
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+      this.destroyRef.onDestroy(() => {
+        if (this.visibilityHandler) {
+          document.removeEventListener('visibilitychange', this.visibilityHandler);
+        }
+      });
+    }
+
     if (!this.prefersReducedMotion) {
       this.startAutoPlay();
     }
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     this.stopAutoPlay();
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
@@ -88,6 +129,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   }
 
   onTouchStart(event: TouchEvent): void {
+    if (event.touches.length !== 1 || !this.isInfinite()) return;
     this.stopAutoPlay();
     this.touchStartX = event.touches[0].clientX;
     this.touchStartY = event.touches[0].clientY;
@@ -98,6 +140,8 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   }
 
   onTouchMove(event: TouchEvent): void {
+    if (event.touches.length !== 1 || !this.isInfinite()) return;
+
     const dx = event.touches[0].clientX - this.touchStartX;
     const dy = event.touches[0].clientY - this.touchStartY;
 
@@ -132,7 +176,9 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
     this.touchDeltaX = 0;
     this.isSwiping = false;
     this.directionLocked = false;
-    this.startAutoPlay();
+    if (this.isInfinite()) {
+      this.startAutoPlay();
+    }
   }
 
   onTransitionEnd(): void {
@@ -165,6 +211,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
       cancelAnimationFrame(this.rafId);
     }
     this.rafId = requestAnimationFrame(() => {
+      if (this.destroyed) return;
       const viewportWidth = this.getViewportWidth();
       this.translateX.set(-this.trackIndex() * viewportWidth);
       this.rafId = null;
@@ -172,7 +219,7 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
   }
 
   private startAutoPlay(): void {
-    if (this.prefersReducedMotion) return;
+    if (this.prefersReducedMotion || !this.isInfinite()) return;
     this.stopAutoPlay();
     this.autoTimer = setInterval(() => {
       this.goToIndex(this.trackIndex() + 1);
@@ -185,5 +232,4 @@ export class MobileCarouselComponent implements OnInit, OnDestroy {
       this.autoTimer = null;
     }
   }
-
 }

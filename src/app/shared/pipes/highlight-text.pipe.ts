@@ -1,10 +1,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+export interface TextSegment {
+  text: string;
+  highlight: boolean;
+}
 
-@Pipe({ name: 'highlightText' })
+@Pipe({ name: 'highlightText', pure: true })
 export class HighlightTextPipe implements PipeTransform {
-  transform(value: string): { text: string; highlight: boolean }[] {
-    const segments: { text: string; highlight: boolean }[] = [];
+  transform(value: string | null | undefined): TextSegment[] {
+    if (!value) return [];
+
+    const segments: TextSegment[] = [];
     const regex = /\*\*(.*?)\*\*/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;

@@ -1,18 +1,64 @@
-@if (banners().length) {
-  <div class="carousel__viewport" role="region" aria-roledescription="carousel" aria-label="Banner carousel">
+@if (banners().length === 1) {
+  <div class="carousel__viewport" role="region" aria-label="Banner">
+    <div class="carousel__track">
+      <div
+        class="carousel__slide"
+        [style.background-image]="'url(' + banners()[0].backgroundImage + ')'"
+        role="group"
+        aria-roledescription="slide"
+        aria-label="Slide 1 of 1"
+      >
+        @if (banners()[0].mainImage) {
+          <img
+            class="carousel__image"
+            [ngSrc]="banners()[0].mainImage!"
+            [alt]="banners()[0].title"
+            width="378"
+            height="257"
+            priority
+          />
+        }
+        <div class="carousel__content">
+          <h2 class="carousel__title">{{ banners()[0].title }}</h2>
+          <p class="carousel__text">@for (seg of banners()[0].text | highlightText; track $index) {<span [class.carousel__highlight]="seg.highlight">{{ seg.text }}</span>}</p>
+          <app-button variant="outline" [ariaLabel]="banners()[0].buttonText">
+            {{ banners()[0].buttonText }}
+          </app-button>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (banners().length > 1) {
+  <div
+    class="carousel__viewport"
+    role="region"
+    aria-roledescription="carousel"
+    aria-label="Banner carousel"
+    tabindex="0"
+  >
+    <div
+      aria-live="polite"
+      aria-atomic="true"
+      class="visually-hidden"
+    >
+      Slide {{ activeSlideIndex() }} of {{ slideCount() }}
+    </div>
+
     <div
       class="carousel__track"
       [style.transform]="'translateX(' + translateX() + 'px)'"
       [class.carousel__track--transitioning]="isTransitioning()"
       (transitionend)="onTransitionEnd()"
     >
-      @for (slide of slides(); track $index; let i = $index) {
+      @for (slide of slides(); track slide.id + '-' + $index; let i = $index) {
         <div
           class="carousel__slide"
           [style.background-image]="'url(' + slide.backgroundImage + ')'"
           role="group"
           aria-roledescription="slide"
-          [attr.aria-label]="'Slide ' + (i) + ' of ' + slideCount()"
+          [attr.aria-label]="i === 0 || i === slides().length - 1
+            ? null
+            : 'Slide ' + i + ' of ' + slideCount()"
           [attr.aria-hidden]="i === 0 || i === slides().length - 1 ? 'true' : null"
         >
           @if (slide.mainImage) {
@@ -20,8 +66,9 @@
               class="carousel__image"
               [ngSrc]="slide.mainImage"
               [alt]="slide.title"
-              width="240"
-              height="240"
+              width="378"
+              height="257"
+              priority
             />
           }
           <div class="carousel__content">
